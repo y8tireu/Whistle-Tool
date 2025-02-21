@@ -60,7 +60,7 @@ jobs:
           ANDROID_SDK_ROOT: /home/runner/.buildozer/android/platform/android-sdk
 
       - name: Accept Android SDK Licenses
-        run: yes | $ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager --sdk_root=$ANDROID_SDK_ROOT --licenses
+        run: yes | $ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager --sdk_root=$ANDROID_SDK_ROOT --licenses --verbose
         env:
           ANDROID_SDK_ROOT: /home/runner/.buildozer/android/platform/android-sdk
 
