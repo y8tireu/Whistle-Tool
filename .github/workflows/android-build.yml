@@ -45,17 +45,16 @@ jobs:
           cd .buildozer/android/platform
           git clone https://github.com/kivy/python-for-android.git
 
-      - name: Create cmdline-tools latest folder
+      - name: Install Android SDK
         run: |
-          ANDROID_SDK_ROOT=/home/runner/.buildozer/android/platform/android-sdk
-          if [ -d "$ANDROID_SDK_ROOT/cmdline-tools" ]; then
-            mv "$ANDROID_SDK_ROOT/cmdline-tools" "$ANDROID_SDK_ROOT/cmdline-tools_old"
-            mkdir -p "$ANDROID_SDK_ROOT/cmdline-tools/latest"
-            mv "$ANDROID_SDK_ROOT/cmdline-tools_old/"* "$ANDROID_SDK_ROOT/cmdline-tools/latest/"
-          fi
+          wget https://dl.google.com/android/repository/commandlinetools-linux-8512546_latest.zip -O sdk-tools.zip
+          unzip sdk-tools.zip -d $ANDROID_SDK_ROOT/cmdline-tools
+          mv $ANDROID_SDK_ROOT/cmdline-tools/cmdline-tools $ANDROID_SDK_ROOT/cmdline-tools/latest
+        env:
+          ANDROID_SDK_ROOT: /home/runner/.buildozer/android/platform/android-sdk
 
       - name: Accept Android SDK Licenses
-        run: yes | "$ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager" --licenses
+        run: yes | $ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager --licenses
         env:
           ANDROID_SDK_ROOT: /home/runner/.buildozer/android/platform/android-sdk
 
