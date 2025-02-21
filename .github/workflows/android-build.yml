@@ -37,7 +37,7 @@ jobs:
         run: pip install --upgrade pip
 
       - name: Install Buildozer and Python dependencies
-        run: pip install buildozer cython appdirs packaging
+        run: pip install buildozer cython appdirs packaging colorama
 
       - name: Pre-clone python-for-android
         run: |
