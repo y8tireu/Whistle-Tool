@@ -16,6 +16,16 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
 
+      - name: Ensure buildozer.spec has requirements
+        run: |
+          # Check if the requirements line exists; if not, add a default one.
+          if ! grep -q '^requirements *= *' buildozer.spec; then
+            echo "requirements = python3,kivy" >> buildozer.spec
+          else
+            # Replace the existing requirements line with a valid default.
+            sed -i '/^requirements *=/c\requirements = python3,kivy' buildozer.spec
+          fi
+
       - name: Set up Python
         uses: actions/setup-python@v4
         with:
