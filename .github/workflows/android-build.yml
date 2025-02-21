@@ -54,6 +54,13 @@ jobs:
         env:
           ANDROID_SDK_ROOT: /home/runner/.buildozer/android/platform/android-sdk
 
+      - name: Symlink sdkmanager to tools/bin
+        run: |
+          mkdir -p $ANDROID_SDK_ROOT/tools/bin
+          ln -s $ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager $ANDROID_SDK_ROOT/tools/bin/sdkmanager
+        env:
+          ANDROID_SDK_ROOT: /home/runner/.buildozer/android/platform/android-sdk
+
       - name: Accept Android SDK Licenses
         run: yes | $ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager --sdk_root=$ANDROID_SDK_ROOT --licenses
         env:
