@@ -1,7 +1,7 @@
 [app]
 title = BigBackBob
 package.name = bigbackbob
-package.domain = y8tireu.whistle
+package.domain = org.example
 source.dir = .
 source.include_exts = py,kv,png,jpg,atlas
 entrypoint = bigbackbob.py
@@ -19,5 +19,6 @@ android.api = 28
 android.minapi = 21
 android.sdk = 24
 android.ndk = 19b
+android.build_tools_version = 33.0.0
 android.private_storage = True
 android.gradle_dependencies =
