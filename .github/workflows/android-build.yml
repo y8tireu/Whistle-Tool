@@ -54,10 +54,8 @@ jobs:
         env:
           ANDROID_SDK_ROOT: /home/runner/.buildozer/android/platform/android-sdk
 
-      - name: Symlink sdkmanager to tools/bin
-        run: |
-          mkdir -p $ANDROID_SDK_ROOT/tools/bin
-          ln -s $ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager $ANDROID_SDK_ROOT/tools/bin/sdkmanager
+      - name: Symlink cmdline-tools to tools
+        run: ln -s $ANDROID_SDK_ROOT/cmdline-tools/latest $ANDROID_SDK_ROOT/tools
         env:
           ANDROID_SDK_ROOT: /home/runner/.buildozer/android/platform/android-sdk
 
