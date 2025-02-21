@@ -1,7 +1,7 @@
 [app]
 title = BigBackBob
 package.name = bigbackbob
-package.domain = org.example
+package.domain = y8tireu-llc.bigbackwhistle
 source.dir = .
 source.include_exts = py,kv,png,jpg,atlas
 entrypoint = bigbackbob.py
