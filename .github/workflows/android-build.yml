@@ -70,7 +70,7 @@ jobs:
           cd .buildozer/android/platform
           git clone https://github.com/kivy/python-for-android.git
 
-      - name: Install Android SDK
+      - name: Install Android SDK Command-line Tools
         run: |
           mkdir -p $ANDROID_SDK_ROOT/cmdline-tools
           wget https://dl.google.com/android/repository/commandlinetools-linux-8512546_latest.zip -O sdk-tools.zip
@@ -79,10 +79,14 @@ jobs:
           ls -l $ANDROID_SDK_ROOT/cmdline-tools/latest
 
       - name: Symlink cmdline-tools to tools
-        run: ln -s $ANDROID_SDK_ROOT/cmdline-tools/latest $ANDROID_SDK_ROOT/tools
+        run: ln -s $ANDROID_SDK_ROOT/cmdline-tools/latest $ANDROID_SDK_ROOT/tools || true
 
       - name: Accept Android SDK Licenses
         run: yes | $ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager --sdk_root=$ANDROID_SDK_ROOT --licenses --verbose
+
+      - name: Install Android SDK components
+        run: |
+          $ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager --sdk_root=$ANDROID_SDK_ROOT "platform-tools" "platforms;android-28" "build-tools;28.0.3"
 
       - name: Build Android APK with Buildozer
         run: |
