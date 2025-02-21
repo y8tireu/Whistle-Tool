@@ -11,6 +11,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       JAVA_HOME: /usr/lib/jvm/java-8-openjdk-amd64
+      ANDROID_SDK_ROOT: /home/runner/.buildozer/android/platform/android-sdk
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
@@ -52,18 +53,12 @@ jobs:
           unzip sdk-tools.zip -d $ANDROID_SDK_ROOT/cmdline-tools
           mv $ANDROID_SDK_ROOT/cmdline-tools/cmdline-tools $ANDROID_SDK_ROOT/cmdline-tools/latest
           ls -l $ANDROID_SDK_ROOT/cmdline-tools/latest
-        env:
-          ANDROID_SDK_ROOT: /home/runner/.buildozer/android/platform/android-sdk
 
       - name: Symlink cmdline-tools to tools
         run: ln -s $ANDROID_SDK_ROOT/cmdline-tools/latest $ANDROID_SDK_ROOT/tools
-        env:
-          ANDROID_SDK_ROOT: /home/runner/.buildozer/android/platform/android-sdk
 
       - name: Accept Android SDK Licenses
         run: yes | $ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager --sdk_root=$ANDROID_SDK_ROOT --licenses --verbose
-        env:
-          ANDROID_SDK_ROOT: /home/runner/.buildozer/android/platform/android-sdk
 
       - name: Build Android APK with Buildozer
         run: |
