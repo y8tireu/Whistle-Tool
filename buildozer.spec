@@ -1,12 +1,13 @@
 [app]
 title = BigBackBob
 package.name = bigbackbob
-package.domain = y8tireu-llc.bigbackwhistle
+package.domain = y8tireu.whistle
 source.dir = .
 source.include_exts = py,kv,png,jpg,atlas
 entrypoint = bigbackbob.py
 version = 0.1
-requirements = python3,kivy,numpy,pyjnius
+# Add colorama to the list of requirements
+requirements = python3,kivy,numpy,pyjnius,colorama
 android.permissions = RECORD_AUDIO
 orientation = portrait
 
