@@ -1,12 +1,12 @@
 [app]
 title = BigBackBob
 package.name = bigbackbob
-package.domain = org.example
+package.domain = y8tireu.whistle
 source.dir = .
 source.include_exts = py,kv,png,jpg,atlas
 entrypoint = bigbackbob.py
 version = 0.1
-requirements = python3,kivy,numpy,pyjnius,colorama,jinja2
+requirements = python3,kivy,numpy,pyjnius,colorama,jinja2,ffpyplayer,pillow
 android.permissions = RECORD_AUDIO
 orientation = portrait
 
