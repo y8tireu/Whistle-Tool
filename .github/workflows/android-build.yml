@@ -45,6 +45,9 @@ jobs:
           cd .buildozer/android/platform
           git clone https://github.com/kivy/python-for-android.git
 
+      - name: Accept Android SDK Licenses
+        run: yes | /home/runner/.buildozer/android/platform/android-sdk/tools/bin/sdkmanager --licenses
+
       - name: Build Android APK with Buildozer
         run: |
           PYTHONWARNINGS="ignore:prerequisites.py is experimental" buildozer android clean
