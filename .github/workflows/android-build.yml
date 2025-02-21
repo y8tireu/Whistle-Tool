@@ -9,28 +9,41 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
     env:
-      JAVA_VERSION: '11'  # Updated from Java 8 to 11 for better compatibility
-      ANDROID_SDK_ROOT: ${{ github.workspace }}/android-sdk
-      BUILDOZER_VERSION: '1.5.0'  # Specify a stable version
-
+      JAVA_HOME: /usr/lib/jvm/java-8-openjdk-amd64
+      ANDROID_SDK_ROOT: ${{ github.workspace }}/.buildozer/android/platform/android-sdk
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4  # Updated to v4
+        uses: actions/checkout@v3
 
-      - name: Set up Java
-        uses: actions/setup-java@v4  # Updated to v4
-        with:
-          distribution: 'temurin'
-          java-version: ${{ env.JAVA_VERSION }}
+      - name: Ensure buildozer.spec has non-empty requirements
+        run: |
+          # Exit if buildozer.spec doesn't exist
+          if [ ! -f buildozer.spec ]; then
+              echo "buildozer.spec file not found!"
+              exit 1
+          fi
+          # Check if the 'requirements' line exists.
+          if grep -q '^requirements\s*=' buildozer.spec; then
+              # If it exists but is empty, update it.
+              if grep -q '^requirements\s*=\s*$' buildozer.spec; then
+                  sed -i 's/^requirements\s*=.*/requirements = python3,kivy/' buildozer.spec
+                  echo "Empty requirements line found. Updated to: requirements = python3,kivy"
+              else
+                  echo "Existing non-empty requirements line found. Leaving it unchanged."
+              fi
+          else
+              # If the requirements line is missing, append the default.
+              echo "requirements = python3,kivy" >> buildozer.spec
+              echo "Appended default requirements line."
+          fi
+          echo "Current requirements line:"
+          grep '^requirements' buildozer.spec
 
       - name: Set up Python
-        uses: actions/setup-python@v5  # Updated to v5
+        uses: actions/setup-python@v4
         with:
           python-version: '3.9'
-          cache: 'pip'
 
       - name: Install system dependencies
         run: |
@@ -39,75 +52,45 @@ jobs:
             git \
             zip \
             unzip \
+            openjdk-8-jdk \
             build-essential \
             libssl-dev \
             libffi-dev \
-            python3-dev \
-            autoconf \
-            libtool \
-            pkg-config \
-            zlib1g-dev \
-            libncurses5-dev \
-            libncursesw5-dev \
-            libtinfo5 \
-            cmake
+            python3-dev
 
-      - name: Cache Buildozer global directory
-        uses: actions/cache@v4  # Updated to v4
-        with:
-          path: ~/.buildozer
-          key: ${{ runner.os }}-buildozer-${{ hashFiles('buildozer.spec') }}
-          restore-keys: |
-            ${{ runner.os }}-buildozer-
+      - name: Upgrade pip
+        run: pip install --upgrade pip
 
-      - name: Install Python dependencies
+      - name: Install Buildozer and Python dependencies
+        run: pip install buildozer cython appdirs packaging colorama jinja2 toml "build<0.10.0"
+
+      - name: Pre-clone python-for-android
         run: |
-          python -m pip install --upgrade pip
-          pip install --upgrade \
-            buildozer==${{ env.BUILDOZER_VERSION }} \
-            cython \
-            virtualenv \
-            wheel \
-            setuptools \
-            appdirs \
-            packaging \
-            colorama \
-            jinja2 \
-            toml
+          mkdir -p .buildozer/android/platform
+          cd .buildozer/android/platform
+          git clone https://github.com/kivy/python-for-android.git
 
-      - name: Set up Android SDK
+      - name: Install Android SDK
         run: |
           mkdir -p $ANDROID_SDK_ROOT/cmdline-tools
-          wget https://dl.google.com/android/repository/commandlinetools-linux-9477386_latest.zip -O sdk-tools.zip
-          unzip sdk-tools.zip -d $ANDROID_SDK_ROOT/cmdline-tools/
+          wget https://dl.google.com/android/repository/commandlinetools-linux-8512546_latest.zip -O sdk-tools.zip
+          unzip sdk-tools.zip -d $ANDROID_SDK_ROOT/cmdline-tools
           mv $ANDROID_SDK_ROOT/cmdline-tools/cmdline-tools $ANDROID_SDK_ROOT/cmdline-tools/latest
-          rm sdk-tools.zip
+          ls -l $ANDROID_SDK_ROOT/cmdline-tools/latest
 
-      - name: Set up Android SDK tools
+      - name: Symlink cmdline-tools to tools
+        run: ln -s $ANDROID_SDK_ROOT/cmdline-tools/latest $ANDROID_SDK_ROOT/tools
+
+      - name: Accept Android SDK Licenses
+        run: yes | $ANDROID_SDK_ROOT/cmdline-tools/latest/bin/sdkmanager --sdk_root=$ANDROID_SDK_ROOT --licenses --verbose
+
+      - name: Build Android APK with Buildozer
         run: |
-          echo "$ANDROID_SDK_ROOT/cmdline-tools/latest/bin" >> $GITHUB_PATH
-          echo "$ANDROID_SDK_ROOT/platform-tools" >> $GITHUB_PATH
-          
-          yes | sdkmanager --licenses --sdk_root=$ANDROID_SDK_ROOT
-          sdkmanager --sdk_root=$ANDROID_SDK_ROOT \
-            "platform-tools" \
-            "platforms;android-33" \
-            "build-tools;33.0.2" \
-            "ndk;25.2.9519653"
+          PYTHONWARNINGS="ignore:prerequisites.py is experimental" buildozer android clean
+          PYTHONWARNINGS="ignore:prerequisites.py is experimental" buildozer android debug
 
-      - name: Build Android APK
-        env:
-          BUILDOZER_WARN_ON_ROOT: 0
-        run: |
-          # Clean any previous builds
-          buildozer android clean
-          
-          # Build debug APK
-          buildozer android debug
-
-      - name: Upload Debug APK
+      - name: Upload APK Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: debug-apk
+          name: apk
           path: bin/*.apk
-          retention-days: 14
