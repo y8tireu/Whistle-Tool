@@ -39,11 +39,17 @@ jobs:
       - name: Install Buildozer and dependencies
         run: pip install buildozer cython
 
+      - name: Pre-clone python-for-android
+        run: |
+          # Create the expected directory
+          mkdir -p .buildozer/android/platform
+          cd .buildozer/android/platform
+          # Clone the python-for-android repository so Buildozer can find it
+          git clone https://github.com/kivy/python-for-android.git
+
       - name: Build Android APK with Buildozer
         run: |
-          # Clean previous builds
           buildozer android clean
-          # Build the debug APK
           buildozer android debug
 
       - name: Upload APK Artifact
