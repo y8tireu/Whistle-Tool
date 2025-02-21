@@ -10,7 +10,6 @@ jobs:
   build:
     runs-on: ubuntu-latest
     env:
-      # You can customize these if needed.
       JAVA_HOME: /usr/lib/jvm/java-8-openjdk-amd64
     steps:
       - name: Checkout repository
@@ -42,13 +41,13 @@ jobs:
 
       - name: Build Android APK with Buildozer
         run: |
-          # Clean any previous build artifacts
+          # Clean previous builds
           buildozer android clean
-          # Build a debug APK (adjust command as needed)
+          # Build the debug APK
           buildozer android debug
 
       - name: Upload APK Artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: apk
           path: bin/*.apk
